@@ -1,7 +1,13 @@
 # iCyou
-Group Members: Mason Miller, GroupMem2, GroupMem3
+Group Members: Mason Miller, Treson Mariotti, GroupMem3
 
-Project Description:
-This is the final project for CNIT 315 
+Overview
+================
+This is a vulnerability scanner in C
 
-
+Requirements
+===============
+Web portal to download new clients / view results
+find a way to rig searchsploit and C together
+return a pretty json output
+scripts to run web checks maybe

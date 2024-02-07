@@ -1,5 +1,5 @@
 # iCyou
-Group Members: Mason Miller, Treson Mariotti, GroupMem3
+Group Members: Mason Miller, Treson Mariotti, and Javid Dovlatov
 
 Overview
 ================

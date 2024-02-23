@@ -14,7 +14,7 @@ TODO
 
 ### Client
 - [X] detect package manager
-- [ ] store list of packages in array of tuples (package, version)
+- [X] store list of packages in array of tuples (package, version)
 - [ ] send list of tuples back to the server
 - [ ] tm: recive the final report and save it to a file
 

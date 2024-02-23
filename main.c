@@ -47,6 +47,7 @@ void getInstalledPackages() {
     }
 
     // should take the command we found above and run
+    // TODO replace with system()
     snprintf(buffer, sizeof(buffer), "%s", command);
     fp = popen(buffer, "r");
     if (fp == NULL) {
@@ -56,6 +57,7 @@ void getInstalledPackages() {
     }
 
     // Write packages to file
+    // TODO change to 2d list of tuples (package name, version)
     while (fgets(buffer, sizeof(buffer), fp) != NULL) {
         fprintf(outputFile, "%s", buffer);
     }

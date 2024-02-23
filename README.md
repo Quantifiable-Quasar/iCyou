@@ -11,11 +11,15 @@ detailing all the vulnerable versions.
 
 TODO
 ===============
-- detect package manager
-- sore list of packages in array of tuples (package, version)
-- search the NVD for each package in list
-- save query (moves faster with cache/offline option)?
-- compare version number of package to each CVE affected version list
-- save the result to a file
-- print to screen
-- implement as Client-Server thingamajig
+
+### Client
+- [ ] detect package manager
+- [ ] store list of packages in array of tuples (package, version)
+- [ ] send list of tuples back to the server
+- [ ] tm: recive the final report and save it to a file
+
+### Server 
+- [ ] tm: search the NVD for each package in list
+- [ ] tm: compare version number of package to each CVE affected version number 
+- [ ] save the result to a file and print to screen
+- [ ] tm: send report back to the client

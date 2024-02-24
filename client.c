@@ -24,6 +24,7 @@ int main(int argc, char const* argv[]) {
     int client_fd;
     struct sockaddr_in serv_addr;
     char buffer[1024] = { 0 };
+    char ip_addr[16] = {' '};
 
     if ((client_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
         perror("Socket creation error");
@@ -32,9 +33,10 @@ int main(int argc, char const* argv[]) {
 
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_port = htons(PORT);
-
-    if (inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr) <= 0) {
-        perror("Invalid address/ Address not supported");
+    printf("Please enter an address to connect to: ");
+    scanf("%s", &ip_addr);
+    if (inet_pton(AF_INET, ip_addr, &serv_addr.sin_addr) <= 0) {
+        perror("\nInvalid address/ Address not supported");
         return -1;
     }
 

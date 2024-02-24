@@ -45,33 +45,41 @@ int main() {
         perror("listen");
         exit(EXIT_FAILURE);
     }
-    if ((new_socket = accept(server_fd, (struct sockaddr *)&address,
-                             (socklen_t *)&addrlen)) < 0) {
-        perror("accept");
-        exit(EXIT_FAILURE);
-    }
-    ssize_t total_bytes_received = 0;
-    ssize_t buffer_size = INITIAL_BUFFER_SIZE;
-    ssize_t bytes_received;
-    while ((bytes_received = read(new_socket, buffer + total_bytes_received, buffer_size - total_bytes_received)) > 0) {
-        total_bytes_received += bytes_received;
-        if (total_bytes_received == buffer_size) {
-            // Resize the buffer
-            buffer_size *= 2;
-            buffer = (char *)realloc(buffer, buffer_size * sizeof(char));
-            if (buffer == NULL) {
-                perror("Failed to reallocate memory for buffer");
-                exit(EXIT_FAILURE);
+
+    // Continuously accept connections
+    while (1) {
+        if ((new_socket = accept(server_fd, (struct sockaddr *)&address,
+                                 (socklen_t *)&addrlen)) < 0) {
+            perror("accept");
+            exit(EXIT_FAILURE);
+        }
+
+        // Receive data
+        ssize_t total_bytes_received = 0;
+        ssize_t buffer_size = INITIAL_BUFFER_SIZE;
+        ssize_t bytes_received;
+        while ((bytes_received = read(new_socket, buffer + total_bytes_received, buffer_size - total_bytes_received)) > 0) {
+            total_bytes_received += bytes_received;
+            if (total_bytes_received == buffer_size) {
+                // Resize the buffer
+                buffer_size *= 2;
+                buffer = (char *)realloc(buffer, buffer_size * sizeof(char));
+                if (buffer == NULL) {
+                    perror("Failed to reallocate memory for buffer");
+                    exit(EXIT_FAILURE);
+                }
             }
         }
+        if (bytes_received < 0) {
+            perror("read failed");
+            exit(EXIT_FAILURE);
+        }
+
+        printf("Received data from client: %s\n", buffer);
+        close(new_socket);
     }
-    if (bytes_received < 0) {
-        perror("read failed");
-        exit(EXIT_FAILURE);
-    }
-    printf("Received data from client: %s\n", buffer);
+
     free(buffer);
-    close(new_socket);
     close(server_fd);
     return 0;
 }

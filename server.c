@@ -7,6 +7,11 @@
 
 #define PORT 8080
 #define INITIAL_BUFFER_SIZE 1024
+/* 
+ * print output for sucess as well as failure
+ * command line options (help, verbose, port, etc)
+ * maybe multithread the conenction funciton so many clients can acccess.
+*/
 
 int main() {
     int server_fd, new_socket;

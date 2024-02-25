@@ -12,6 +12,15 @@
 #define MAX_VERSION_LENGTH 50
 #define MAX_PACKAGES 10000
 
+/* Biggest changes to make
+ * change ip from input to arg (default localhost)
+ * no json package here (easier to compile on client)
+ * help menu
+ * print output to terminal for logs and stuff (send to log file instead??)
+ *      - yes and use -v if you want output to terminal
+ * yum support?
+*/
+
 typedef struct {
     char name[MAX_PACKAGE_NAME_LENGTH];
     char version[MAX_VERSION_LENGTH];
@@ -23,7 +32,6 @@ void getInstalledPackages(PackageInfo packages[], int *packageCount);
 int main(int argc, char const* argv[]) {
     int client_fd;
     struct sockaddr_in serv_addr;
-    char buffer[1024] = { 0 };
     char ip_addr[16] = {' '};
 
     if ((client_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
@@ -33,7 +41,9 @@ int main(int argc, char const* argv[]) {
 
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_port = htons(PORT);
+
     printf("Please enter an address to connect to: ");
+
     scanf("%s", &ip_addr);
     if (inet_pton(AF_INET, ip_addr, &serv_addr.sin_addr) <= 0) {
         perror("\nInvalid address/ Address not supported");
@@ -83,6 +93,8 @@ void getInstalledPackages(PackageInfo packages[], int *packageCount) {
     // Detect package manager
     if (system("command -v apt-get >/dev/null 2>&1") == 0) {
         strcpy(packageManager, "apt");
+
+    // TODO yum support or to old??
     } else if (system("command -v dnf >/dev/null 2>&1") == 0) {
         strcpy(packageManager, "dnf");
     } else if (system("command -v pacman >/dev/null 2>&1") == 0) {

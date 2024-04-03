@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <curl/curl.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <unistd.h>
@@ -81,6 +82,7 @@ int main() {
         }
 
         printf("Received data from client: %s\n", buffer);
+        // THIS IS WHERE THE CURL STUFF GOES
         close(new_socket);
     }
 

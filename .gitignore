@@ -2,3 +2,5 @@ a.out
 main
 server
 client
+installed_pkg.txt
+pkgs/*

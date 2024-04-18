@@ -8,11 +8,8 @@
 
 #define PORT 8080
 #define INITIAL_BUFFER_SIZE 1024
-/* 
- * print output for sucess as well as failure
- * command line options (help, verbose, port, etc)
- * maybe multithread the conenction funciton so many clients can acccess.
-*/
+
+int curlToFile(char* url, char* outfile);
 
 int main() {
     int server_fd, new_socket;
@@ -64,6 +61,7 @@ int main() {
         ssize_t total_bytes_received = 0;
         ssize_t buffer_size = INITIAL_BUFFER_SIZE;
         ssize_t bytes_received;
+
         while ((bytes_received = read(new_socket, buffer + total_bytes_received, buffer_size - total_bytes_received)) > 0) {
             total_bytes_received += bytes_received;
             if (total_bytes_received == buffer_size) {
@@ -81,8 +79,25 @@ int main() {
             exit(EXIT_FAILURE);
         }
 
-        printf("Received data from client: %s\n", buffer);
-        // THIS IS WHERE THE CURL STUFF GOES
+//        printf("Received data from client: %s\n", buffer);
+
+            
+            char package[INITIAL_BUFFER_SIZE];
+            char version[INITIAL_BUFFER_SIZE];
+
+            char *line = strtok(buffer, "\n");
+            while(line != NULL) {
+                    sscanf(line, "%s %s", package, version);
+                    printf("Package: %s, Version %s\n", package, version);
+                    char url[INITIAL_BUFFER_SIZE];
+                    strcat(url, "https://services.nvd.nist.gov/rest/json/cves/2.0?keywordSearch=");
+                    strcat(url, package);
+                    line = strtok(NULL, "\n");
+                    printf("url: %s\n", url);
+                    curlToFile(url, package);
+                    memset(url,0,strlen(url));
+            }
+        
         close(new_socket);
     }
 
@@ -91,3 +106,31 @@ int main() {
     return 0;
 }
 
+int curlToFile(char* url, char* outfile) {
+        CURL *curl;
+        CURLcode res;
+
+        printf("here\n");
+        
+        printf("Curling url: %s\n", url);
+
+        curl = curl_easy_init();
+        if(curl) {
+                curl_easy_setopt(curl, CURLOPT_URL, url);
+                
+                char out[INITIAL_BUFFER_SIZE] = "pkgs/";
+                strcat(out, outfile);
+                FILE *fptr = fopen(out, "w");
+                curl_easy_setopt(curl, CURLOPT_WRITEDATA, fptr);
+
+                res = curl_easy_perform(curl);
+
+                if(res != CURLE_OK) {
+                        fprintf(stderr, "Curl failed: %s\n", curl_easy_strerror(res));
+                        return 1;
+                }
+        
+                curl_easy_cleanup(curl);
+        }
+        return 0;
+}

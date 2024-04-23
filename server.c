@@ -8,8 +8,12 @@
 
 #define PORT 8080
 #define INITIAL_BUFFER_SIZE 1024
+#define MAX_URL 128
+
 
 int curlToFile(char* url, char* outfile);
+void buildURL(char* package, char* version);
+int wgetToFile(const char* url, const char* outfile);
 
 int main() {
     int server_fd, new_socket;
@@ -81,23 +85,30 @@ int main() {
 
 //        printf("Received data from client: %s\n", buffer);
 
-            
-            char package[INITIAL_BUFFER_SIZE];
-            char version[INITIAL_BUFFER_SIZE];
+          
+            char package[64];
+            char version[64];
+            char finURL[MAX_URL] = "";
+
+            char* test = "https://example.com";
+            char* outfile = "testing";
+            curlToFile(test, outfile);
+           
 
             char *line = strtok(buffer, "\n");
             while(line != NULL) {
-                    sscanf(line, "%s %s", package, version);
-                    printf("Package: %s, Version %s\n", package, version);
-                    char url[INITIAL_BUFFER_SIZE];
-                    strcat(url, "https://services.nvd.nist.gov/rest/json/cves/2.0?keywordSearch=");
-                    strcat(url, package);
-                    line = strtok(NULL, "\n");
-                    printf("url: %s\n", url);
-                    curlToFile(url, package);
-                    memset(url,0,strlen(url));
+                sscanf(line, "%s %s", package, version);
+                printf("Package: %s, Version %s\n", package, version);
+                
+//                buildURL(package, version);
+           //     curlToFile(test, package);
+                  char finURL[MAX_URL];
+                  sprintf(finURL, "https://services.nvd.nist.gov/rest/json/cves/2.0?virtualMatchString=cpe:2.3:a:*:%s:*:*:*:en", package);
+                  wgetToFile(finURL, package);
+
+                line = strtok(NULL, "\n");
             }
-        
+
         close(new_socket);
     }
 
@@ -110,8 +121,6 @@ int curlToFile(char* url, char* outfile) {
         CURL *curl;
         CURLcode res;
 
-        printf("here\n");
-        
         printf("Curling url: %s\n", url);
 
         curl = curl_easy_init();
@@ -134,3 +143,38 @@ int curlToFile(char* url, char* outfile) {
         }
         return 0;
 }
+
+
+void buildURL(char* package, char* version) {
+
+    char *delim = ".";
+    char *line = strtok(version, delim);
+    char finURL[MAX_URL] = "";
+
+    char finver[10] = "";
+    int counter = 1;
+    
+    while(counter <=2 && line != NULL) {
+            int tmpver;
+            sscanf(line, "%d", &tmpver);
+            if(counter == 1) {
+                    sprintf(finver + strlen(finver), "%d.", tmpver);
+            } else {
+                    sprintf(finver + strlen(finver), "%d", tmpver);
+            }
+
+            line = strtok(NULL, delim);
+            counter++;
+    }
+
+    sprintf(finURL, "https://services.nvd.nist.gov/rest/json/cves/2.0?virtualMatchString=cpe:2.3:a:*:%s:%s:*:*:en", package, finver);
+    printf("url: %s\n", finURL);
+}
+
+
+int wgetToFile(const char* url, const char* outfile) {
+    char command[1024];
+    snprintf(command, sizeof(command), "wget -O pkgs/%s %s", outfile, url);
+    return system(command);
+}
+

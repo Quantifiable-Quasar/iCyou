@@ -95,7 +95,7 @@ int main() {
                 printf("Package: %s, Version %s\n", package, version);
                 curlToFile(package, version);
 
-                sleep(5);
+                sleep(6);
                 
                 line = strtok(NULL, "\n");
             }

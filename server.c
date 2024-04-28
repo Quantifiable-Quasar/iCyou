@@ -1,3 +1,5 @@
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -104,29 +106,76 @@ int main() {
     close(server_fd);
     return 0;
 }
-
-int curlToFile(char* package, char* version) {
-
-        char url[INITIAL_BUFFER_SIZE] = "https://services.nvd.nist.gov/rest/json/cves/2.0?VirtualMatchString=cpe:2.3:*:*:"; //%s:*:*:*:en";
-        strcat(url, package);
-        strcat(url, ":*:*:*:en");
-
-        printf("url: %s\n", url);
-
-        CURL* easyhandle = curl_easy_init();
-        curl_easy_setopt(easyhandle, CURLOPT_URL, url);
-        curl_easy_setopt(easyhandle, CURLOPT_USERAGENT, "Mozilla/5.0 (Windows NT 10.0; rv:112.0) Gecko/20100101 Firefox/112.0");
-
-        char outfile[INITIAL_BUFFER_SIZE] = "pkgs/";
-        strcat(outfile, package);
-
-        FILE* file = fopen(outfile, "w");
-
-        curl_easy_setopt(easyhandle, CURLOPT_WRITEDATA, file);
-        curl_easy_perform(easyhandle);
-        curl_easy_cleanup(easyhandle);
-
-        fclose(file);
-
-        return 0;
+// Function to create directory if it doesn't exist
+int createDirectory(const char* path) {
+    struct stat st;
+    if (stat(path, &st) == -1) {
+        // Directory doesn't exist, create it
+        if (mkdir(path, 0777) == -1) {
+            printf("Error: Failed to create directory %s\n", path);
+            return -1;
+        }
+        printf("Directory created: %s\n", path);
+    }
+    return 0;
 }
+
+// Modified curlToFile function
+int curlToFile(char* package, char* version) {
+    // Check if package and version pointers are valid
+    if (package == NULL || version == NULL) {
+        printf("Error: Invalid package or version pointer\n");
+        return -1;
+    }
+
+    char url[INITIAL_BUFFER_SIZE] = "https://services.nvd.nist.gov/rest/json/cves/2.0?VirtualMatchString=cpe:2.3:*:*:";
+    strcat(url, package);
+    strcat(url, ":*:*:*:en");
+
+    printf("url: %s\n", url);
+
+    CURL* easyhandle = curl_easy_init();
+    if (easyhandle == NULL) {
+        printf("Error: Failed to initialize Curl\n");
+        return -1;
+    }
+
+    // Set Curl options
+    curl_easy_setopt(easyhandle, CURLOPT_URL, url);
+    curl_easy_setopt(easyhandle, CURLOPT_USERAGENT, "Mozilla/5.0 (Windows NT 10.0; rv:112.0) Gecko/20100101 Firefox/112.0");
+
+    char outfile[INITIAL_BUFFER_SIZE] = "pkgs/";
+    strcat(outfile, package);
+
+    // Create directory if it doesn't exist
+    if (createDirectory("pkgs") == -1) {
+        curl_easy_cleanup(easyhandle); // Clean up Curl handle
+        return -1;
+    }
+
+    FILE* file = fopen(outfile, "w");
+    if (file == NULL) {
+        printf("Error: Failed to open file %s\n", outfile);
+        curl_easy_cleanup(easyhandle); // Clean up Curl handle
+        return -1;
+    }
+
+    // Set file handle for writing
+    curl_easy_setopt(easyhandle, CURLOPT_WRITEDATA, file);
+
+    // Perform Curl operation
+    CURLcode res = curl_easy_perform(easyhandle);
+    if (res != CURLE_OK) {
+        printf("Error: Curl operation failed: %s\n", curl_easy_strerror(res));
+        fclose(file); // Close file handle
+        curl_easy_cleanup(easyhandle); // Clean up Curl handle
+        return -1;
+    }
+
+    // Clean up and close file handle
+    fclose(file);
+    curl_easy_cleanup(easyhandle);
+
+    return 0;
+}
+

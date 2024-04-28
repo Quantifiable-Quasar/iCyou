@@ -9,6 +9,8 @@ it will use the NVD REST API to search for vulnerabilities in the packages prese
 finds a package with a vulnerability it will save the JSON output of the API to a report 
 detailing all the vulnerable versions.
 
+The project only supports Linux Operating System, and will not run if launched in any other Operating System. Both client and server C codes can be compiled by command `gcc [filename.c] -lcurl -o [output_filename]`
+
 TODO
 ===============
 

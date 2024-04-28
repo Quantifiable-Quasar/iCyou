@@ -10,7 +10,6 @@ Design
 ==============
 The code is designed by assuming that a client-server architecture is present, which means that clients request and receive service from a centralized server. The advantage of this design is that it effectively splits the workload between clients and servers. For example, the server code can function on only one server, and multiple clients can use this server to process their requests rather than sending requests by themselves. It also helps to manage network traffic efficiently by centralizing the handling of requests and responses.
 
-![unnamed](https://github.com/Quantifiable-Quasar/iCyou/assets/78760170/facbe06e-e47e-4fae-9bc3-2685854126e8)
 
 Testing & Details
 ============

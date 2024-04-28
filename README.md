@@ -4,12 +4,9 @@ Group Members: Mason Miller, Treson Mariotti, and Javid Dovlatov
 Overview
 ================
 This is a vulnerability scanner in C. 
-It will first use the built in package manager to get a list of installed packages. Then,
-it will use the NVD REST API to search for vulnerabilities in the packages present. If it 
-finds a package with a vulnerability it will save the JSON output of the API to a report 
-detailing all the vulnerable versions.
+It will first use the built-in package manager to get a list of installed packages. Followingly, the client.c file will prompt for the IP address of the server to connect. After this two steps, the packages and their corresponding version numbers will be sent to the IP address entered. Then, server file will use the NVD REST API to search for vulnerabilities in the packages present. If it finds a package with a vulnerability, it will save the JSON output of the API to a report detailing all the vulnerable versions.
 
-The project only supports Linux Operating System, and will not run if launched in any other Operating System. Both client and server C codes can be compiled by command `gcc [filename.c] -lcurl -o [output_filename]`
+The project only supports Linux Operating System, and will not run if launched in any other Operating System. Since the project utilizes lcurl library, both client and server C codes can be compiled by command `gcc [filename.c] -lcurl -o [output_filename]`
 
 TODO
 ===============

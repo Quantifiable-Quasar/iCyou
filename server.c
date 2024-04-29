@@ -82,7 +82,7 @@ int main() {
             perror("read failed");
             exit(EXIT_FAILURE);
         }
-
+//        Test statement to make sure packages are being recieved
 //        printf("Received data from client: %s\n", buffer);
 
           
@@ -120,7 +120,6 @@ int createDirectory(const char* path) {
     return 0;
 }
 
-// Modified curlToFile function
 int curlToFile(char* package, char* version) {
     // Check if package and version pointers are valid
     if (package == NULL || version == NULL) {
@@ -147,32 +146,29 @@ int curlToFile(char* package, char* version) {
     char outfile[INITIAL_BUFFER_SIZE] = "pkgs/";
     strcat(outfile, package);
 
-    // Create directory if it doesn't exist
     if (createDirectory("pkgs") == -1) {
-        curl_easy_cleanup(easyhandle); // Clean up Curl handle
+        curl_easy_cleanup(easyhandle); 
         return -1;
     }
 
     FILE* file = fopen(outfile, "w");
     if (file == NULL) {
         printf("Error: Failed to open file %s\n", outfile);
-        curl_easy_cleanup(easyhandle); // Clean up Curl handle
+        curl_easy_cleanup(easyhandle); 
         return -1;
     }
 
-    // Set file handle for writing
     curl_easy_setopt(easyhandle, CURLOPT_WRITEDATA, file);
 
-    // Perform Curl operation
+    // perform curl
     CURLcode res = curl_easy_perform(easyhandle);
     if (res != CURLE_OK) {
         printf("Error: Curl operation failed: %s\n", curl_easy_strerror(res));
-        fclose(file); // Close file handle
-        curl_easy_cleanup(easyhandle); // Clean up Curl handle
+        fclose(file); 
+        curl_easy_cleanup(easyhandle);
         return -1;
     }
 
-    // Clean up and close file handle
     fclose(file);
     curl_easy_cleanup(easyhandle);
 

@@ -14,6 +14,7 @@
 
 
 int curlToFile(char* url, char* outfile);
+int createDirectory(const char* path);
 
 int main() {
     int server_fd, new_socket;
@@ -95,7 +96,7 @@ int main() {
                 printf("Package: %s, Version %s\n", package, version);
                 curlToFile(package, version);
 
-                sleep(6);
+                sleep(7);
                 
                 line = strtok(NULL, "\n");
             }
@@ -121,15 +122,16 @@ int createDirectory(const char* path) {
 }
 
 int curlToFile(char* package, char* version) {
+    // https://stackoverflow.com/questions/3471122/saving-a-file-using-libcurl-in-c
     // Check if package and version pointers are valid
     if (package == NULL || version == NULL) {
         printf("Error: Invalid package or version pointer\n");
         return -1;
     }
 
-    char url[INITIAL_BUFFER_SIZE] = "https://services.nvd.nist.gov/rest/json/cves/2.0?VirtualMatchString=cpe:2.3:*:*:";
+    char url[INITIAL_BUFFER_SIZE] = "https://services.nvd.nist.gov/rest/json/cves/2.0?keywordSearch=";
     strcat(url, package);
-    strcat(url, ":*:*:*:en");
+    strcat(url, "&keywordExactMatch");
 
     printf("url: %s\n", url);
 
